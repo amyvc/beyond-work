@@ -8,6 +8,31 @@ if(menu&&nav){
  nav.addEventListener('click',e=>{if(mobile.matches&&e.target.closest('a')){nav.hidden=true;menu.setAttribute('aria-expanded','false');}});
 }
 
+function initContactCopy(){
+ const button=document.querySelector('[data-contact-copy]');if(!button)return;
+ const status=document.querySelector('.contact-copy-status');
+ const fallback=document.querySelector('.contact-copy-fallback');
+ if(!status||!fallback)return;
+ const email=button.dataset.copyEmail;let resetTimer;
+ function showFallback(){
+  if(resetTimer)clearTimeout(resetTimer);
+  fallback.hidden=false;
+  fallback.focus();
+  fallback.select();
+  status.textContent='Automatic copying is unavailable. The address is selected; copy it manually.';
+ }
+ button.addEventListener('click',()=>{
+  if(!navigator.clipboard||typeof navigator.clipboard.writeText!=='function'){showFallback();return;}
+  navigator.clipboard.writeText(email).then(()=>{
+   fallback.hidden=true;
+   status.textContent='Copied!';
+   if(resetTimer)clearTimeout(resetTimer);
+   resetTimer=setTimeout(()=>{status.textContent='';},2200);
+  },showFallback);
+ });
+}
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',initContactCopy);else initContactCopy();
+
 /* Beyond Work: progressive, accessible scroll storytelling. */
 function initBeyondStory(){
  const page=document.querySelector('.beyond-page');
